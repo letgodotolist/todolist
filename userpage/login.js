@@ -98,7 +98,7 @@ router.post('/createusers', async (req, res) => {
 	}
 });
 
-router.post('/check', (req, res) => {
+router.post('/login', (req, res) => {
 
 	console.log("login page open");
 
@@ -177,7 +177,7 @@ router.post('/userdelete/:email', (req, res) => {
 	})
 });
 
-router.get('/check', function(req, res){
+router.get('/login', function(req, res){
 	res.sendFile(__dirname + "/loginpage.html");
 	console.log('login page opening!');
 });
