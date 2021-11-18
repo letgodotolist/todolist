@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 const {User} = require('./seque');
+const bcrypt = require('bcrypt'); // 암호화
 
 
 router.use(bodyParser.urlencoded({ extended:false })); 
@@ -15,7 +16,7 @@ router.post('/createusers', async (req, res) => {
 
 	console.log("create user");
 
-	const { email, password, name } = req.body;
+	const { email, name, password } = req.body;
 
     const exUser = await User.findOne({
 		where : {
@@ -31,12 +32,13 @@ router.post('/createusers', async (req, res) => {
 			res.json(data);
 			
 		}else{
+            const hash = await bcrypt.hash(password, 10);
             var users = await User.create({
-                email, password, name,
+                email, name, password: hash,
 
             });
                 // 유저 생성이 완료된 경우
-                console.log('유저가 생성되었습니다.'+ req.body.email);
+                console.log('유저가 생성되었습니다. '+ req.body.email);
                 res.status(201).json(users);
                 // json으로 회원 하는 아이디 비번 이름이 json으로 안나옴 오류 
 

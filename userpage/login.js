@@ -3,6 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 var secretObj = require("../jwt");
+const bcrypt = require('bcrypt');
 require("dotenv").config();
 const {User} = require('./seque');
 
@@ -21,37 +22,43 @@ router.post('/login', (req, res) => {
 	User.findOne({
 		where : {
 			email : reqemail,
-			password : reqpassword
 		
 		}
-	}).then(function(data)
+	}).then(function(users)
 	{
-		if( data == null || data == undefined ) {
+		if( users == null || users == undefined ) {
 			console.log("아이디 또는 비밀번호가 잘못 입력 되었습니다.");
 			res.status(412)
 			var errormsg = { success: false, msg: '아이디 또는 비밀번호가 잘못 입력 되었습니다.'};
 
 			res.json(errormsg);
 			
-		}else{
-				let token = jwt.sign({
-					email: reqemail,    //토큰내용
-					password: reqpassword 
-				},
-				secretObj.secret, //비밀키
-				{
-					expiresIn: '5m' //유지 시간
-				})
-					res.cookie("User", token);
-					console.log("로그인 성공 email: " + reqemail);
-					var data = {success:true, msg: ' 로그인 되었습니다. '};
-					res.status(200).json({
-						data,
-						token: token
-					}); 
-			}
-	})
-		
+		}
+        bcrypt.compare(reqpassword, users.password).then((isMatch) => {
+            if (isMatch) {
+                const payload = {
+                    email: users.email,
+                    password: users.password,
+                };
+                let token = jwt.sign({
+                    payload,
+                },
+                    secretObj.secret, //비밀키
+                    {
+                        expiresIn: '1m' //유지 시간
+                    })
+                res.cookie("User", token);
+                console.log("로그인 성공 email: " + reqemail);
+                var data = { success: true, msg: ' 로그인 되었습니다. ' };
+                res.status(200).json({
+                    data,
+                    payload,
+                    token: token
+                });
+            };
+
+        });
+    });	
 		
 });
 
@@ -96,4 +103,4 @@ router.get('/login', function(req, res){
 	console.log('login page opening!');
 });
 
-module.exports = router
+module.exports = router;
