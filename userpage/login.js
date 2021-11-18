@@ -58,10 +58,12 @@ router.post('/login', (req, res) => {
 router.post('/userdelete/:email', (req, res) => {
 	//email 과 일치하는 row를 삭제 할것
 	var reqemail = req.body.email;
+    var reqpassword = req.body.password;
 
 	User.findOne({
 		where : {
 			email : reqemail,
+            password : reqpassword
 		}
 
 	}).then(function(data)
