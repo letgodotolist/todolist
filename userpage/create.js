@@ -31,7 +31,7 @@ router.post('/createusers', async (req, res) => {
 			res.json(data);
 			
 		}else{
-            var users = User.create({
+            var users = await User.create({
                 email, password, name,
 
             });
