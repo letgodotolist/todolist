@@ -1,102 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-const Sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
 var secretObj = require("../jwt");
 require("dotenv").config();
+const {User} = require('./seque');
+
 
 router.use(bodyParser.urlencoded({ extended:false })); 
 router.use(bodyParser.json());
-
-
-
-
-const sequelize = new Sequelize('unsplash', 'root', process.env.MYSQL_PASSWORD, {
-	host: '127.0.0.1',
-	dialect: 'mysql',
-	logging: false,
-	define: {
-		charset: 'utf8',
-		collate: 'utf8_general_ci',
-	},
-	pool: {
-		max: 5, 	//db 접속자 최대 숫자
-		min: 0,
-		acquire: 30000,
-		idle: 5000,
-	},
-}); //sequelize 정의
-
-// UserLogin Table 생성 함수 정의
-const UserLoginTable = (sequelize, DataTypes) => {
-	return sequelize.define('user', {
-		id: {
-			type: DataTypes.INTEGER,
-			autoIncrement: true,
-			primaryKey: true,
-			comment: 'proper id',
-		},
-		name: {
-			type: DataTypes.STRING(40),
-			allowNull: false,
-			comment: 'name',
-		},
-		email: {
-			type: DataTypes.STRING(40),
-			allowNull: false,
-			comment: 'user email',
-		},
-		password: {
-			type: DataTypes.STRING(40),
-			allowNull: false,
-			comment: 'password',
-		},
-	
-	},
-	//sequelize table 설정 및 등등
-	{
-		classMethods: {},
-		tablesName: "user",
-		freezeTableName: true,
-		underscored: true,
-		timesettamps: false,
-	});
-};
-
-// UserLogin Table 생성 함수 정의
-
-const User = UserLoginTable(sequelize, Sequelize.DataTypes);
-
-sequelize
-	.sync({ force: true })
-	.then(() => {
-		console.log(' DB running ');
-	})
-	.catch((err) => {
-		console.log('fail');
-		console.log(err);
-	});
-
-// db에 사용자 데이터를 넣는다 (회원가입)
-router.post('/createusers', async (req, res) => {
-
-	console.log("createuser page open");
-
-	const { email, password, name } = req.body;
-	const user = await User.create({
-		email, password, name,
-	});
-	if (user) {
-		// 유저 생성이 완료된 경우
-		console.log('유저가 생성되었습니다.');
-		res.status(201).json(user);
-	} else {
-		// 유저 생성이 실패한 경우
-		console.log('유저 생성에 실패하였습니다.');
-		res.status(400).send('유저 생성에 실패하였습니다.');
-	}
-});
 
 router.post('/login', (req, res) => {
 
@@ -116,10 +28,10 @@ router.post('/login', (req, res) => {
 	{
 		if( data == null || data == undefined ) {
 			console.log("아이디 또는 비밀번호가 잘못 입력 되었습니다.");
-			res.status(412) ;
-			var data = { success: false, msg: '아이디 또는 비밀번호가 잘못 입력 되었습니다.'};
+			res.status(412)
+			var errormsg = { success: false, msg: '아이디 또는 비밀번호가 잘못 입력 되었습니다.'};
 
-			res.json(data);
+			res.json(errormsg);
 			
 		}else{
 				let token = jwt.sign({
