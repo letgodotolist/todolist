@@ -1,7 +1,7 @@
 //sequelize 재사용을 위한 파일
 const Sequelize = require('sequelize');
 require("dotenv").config();
-const bcrypt = require('bcrypt');
+
 
 
 const sequelize = new Sequelize('unsplash', 'root', process.env.MYSQL_PASSWORD, {
@@ -44,6 +44,7 @@ const UserLoginTable = (sequelize, DataTypes) => {
 			allowNull: false,
 			comment: 'password',
 		},
+        
 	
 	},
 	//sequelize table 설정 및 등등
@@ -53,14 +54,6 @@ const UserLoginTable = (sequelize, DataTypes) => {
 		freezeTableName: true,
 		underscored: true,
 		timesettamps: false,
-        instanceMethods: {
-            generateHash(password) {
-                return bcrypt.hash(password, bcrypt.genSaltSync(10));
-            },
-            validPassword(password) {
-                return bcrypt.compare(password, this.password);
-            },
-        }
         
 	});
 };

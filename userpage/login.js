@@ -2,10 +2,10 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-var secretObj = require("../jwt");
 const bcrypt = require('bcrypt');
 require("dotenv").config();
 const {User} = require('./seque');
+
 
 
 router.use(bodyParser.urlencoded({ extended:false })); 
@@ -43,9 +43,9 @@ router.post('/login', (req, res) => {
                 let token = jwt.sign({
                     payload,
                 },
-                    secretObj.secret, //비밀키
+					process.env.JWT_SECRET, //비밀키
                     {
-                        expiresIn: '1m' //유지 시간
+                        expiresIn: '15m' //유지 시간
                     })
                 res.cookie("User", token);
                 console.log("로그인 성공 email: " + reqemail);
@@ -55,7 +55,15 @@ router.post('/login', (req, res) => {
                     payload,
                     token: token
                 });
-            };
+            }else{
+				console.log("아이디 또는 비밀번호가 잘못 입력 되었습니다.");
+				res.status(412)
+				var errormsg = { success: false, msg: '아이디 또는 비밀번호가 잘못 입력 되었습니다.' };
+
+				res.json(errormsg);
+
+
+			};
 
         });
     });	
