@@ -2,7 +2,7 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-const {User} = require('./seque');
+const {User} = require('../dbmodels/seque');
 const bcrypt = require('bcrypt'); // 암호화
 
 
