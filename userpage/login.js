@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require("dotenv").config();
-const {User} = require('./seque');
+const {dbUser} = require('../dbmodels/seque');
 
 
 
@@ -19,7 +19,7 @@ router.post('/login', (req, res) => {
 	var reqemail = req.body.email;
 	var reqpassword = req.body.password;
 
-	User.findOne({
+	dbUser.findOne({
 		where : {
 			email : reqemail,
 		
@@ -75,7 +75,7 @@ router.post('/userdelete/:email', (req, res) => {
 	var reqemail = req.body.email;
     var reqpassword = req.body.password;
 
-	User.findOne({
+	dbUser.findOne({
 		where : {
 			email : reqemail,
             password : reqpassword
@@ -94,7 +94,7 @@ router.post('/userdelete/:email', (req, res) => {
 				console.log("유저 삭제 완료 email: " + reqemail);
 				res.status(200);
 
-				User.destroy({where : {email : reqemail }})
+				dbUser.destroy({where : {email : reqemail }})
 				.then(result => {
 					res.json({});
 				 }).catch(err => {
